@@ -1,0 +1,18 @@
+{
+  "apiBaseUri": "${CONDUIT_API_BASE_URI:http://localhost:3001/api}",
+  "webUrl": "${UI_BASE_URL:http://localhost:3001}",
+  "timeoutSeconds": 10,
+  "jwtSecret": "${CONDUIT_JWT_KEY:local-test-secret}",
+  "users": {
+    "standardConduitUser": {
+      "username": "${TEST_USER_USERNAME:testuser}",
+      "password": "${TEST_USER_PASSWORD:TestPassword123!}",
+      "email": "${TEST_USER_EMAIL:testuser@conduit.local}"
+    }
+  },
+  "database": {
+    "host": "${CONDUIT_DB_URL:jdbc:postgresql://localhost:5432/conduit}",
+    "username": "${CONDUIT_DB_USERNAME:conduit}",
+    "password": "${CONDUIT_DB_PASSWORD:conduit}"
+  }
+}

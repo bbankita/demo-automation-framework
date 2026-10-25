@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Conduit user response",
+  "description": "Body returned by POST /users, POST /users/login, GET /user and PUT /user",
+  "type": "object",
+  "required": ["user"],
+  "additionalProperties": false,
+  "properties": {
+    "user": {
+      "type": "object",
+      "required": ["email", "username", "token", "bio", "image"],
+      "additionalProperties": false,
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "username": {
+          "type": "string",
+          "minLength": 1
+        },
+        "token": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$"
+        },
+        "bio": {
+          "type": ["string", "null"]
+        },
+        "image": {
+          "type": ["string", "null"]
+        }
+      }
+    }
+  }
+}

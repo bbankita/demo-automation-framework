@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.ankita.qa</groupId>
+    <artifactId>demo-automation-framework</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>Demo Automation Framework</name>
+    <description>Cucumber BDD framework: API tests (Conduit) and UI tests (SauceDemo)</description>
+
+    <properties>
+        <maven.compiler.release>11</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Newest versions that still support Java 11 -->
+        <cucumber.version>7.34.9</cucumber.version>
+        <selenium.version>4.26.0</selenium.version>
+        <rest-assured.version>5.5.7</rest-assured.version>
+        <jackson.version>2.22.3</jackson.version>
+        <datafaker.version>1.9.0</datafaker.version>
+        <assertj.version>3.27.7</assertj.version>
+        <logback.version>1.5.38</logback.version>
+        <junit.version>4.13.2</junit.version>
+        <lombok.version>1.18.32</lombok.version>
+
+        <surefire.version>3.5.6</surefire.version>
+        <compiler.version>3.13.0</compiler.version>
+        <cluecumber.version>3.12.0</cluecumber.version>
+
+        <postgresql.version>42.7.4</postgresql.version>
+
+        <!-- Overridable from the command line: mvn test -Dparallel.threads=8 -->
+        <parallel.threads>4</parallel.threads>
+        <!-- A run that executes 0 scenarios fails the build; -DfailIfNoTests=false to allow it -->
+        <failIfNoTests>true</failIfNoTests>
+    </properties>
+
+    <dependencies>
+        <!-- BDD -->
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-picocontainer</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- UI -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>${selenium.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- API -->
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>${rest-assured.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>${rest-assured.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Test data and assertions -->
+        <dependency>
+            <groupId>net.datafaker</groupId>
+            <artifactId>datafaker</artifactId>
+            <version>${datafaker.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Boilerplate (compile-time only) -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Logging (SLF4J API comes transitively with logback-classic) -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- JWT Library -->
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>4.4.0</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- JDBC for Postgres (for DB testing) -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <version>4.2.2</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${compiler.version}</version>
+                <configuration>
+                    <!-- Explicit path: JDK 23+ no longer runs annotation processors found on the classpath -->
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!-- Default: run nothing unless a profile selects a runner -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${surefire.version}</version>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!-- mvn cluecumber:reporting -> merges every JSON in target/cucumber-report -->
+                <groupId>com.trivago.rta</groupId>
+                <artifactId>cluecumber-maven</artifactId>
+                <version>${cluecumber.version}</version>
+                <configuration>
+                    <sourceJsonReportDirectory>${project.build.directory}/cucumber-report</sourceJsonReportDirectory>
+                    <generatedHtmlReportDirectory>${project.build.directory}/generated-report
+                    </generatedHtmlReportDirectory>
+                    <customPageTitle>Demo Automation Framework</customPageTitle>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>test-suite</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skipTests>false</skipTests>
+                            <includes>
+                                <include>**/TestRunner.java</include>
+                            </includes>
+                            <!-- cucumber-junit runs features in parallel with this mode -->
+                            <parallel>both</parallel>
+                            <threadCount>${parallel.threads}</threadCount>
+                            <!-- The parallel provider swallows class-level errors (e.g. @BeforeClass, config
+                                 loading) and reports 0 tests run; treat that as a failure instead of a green build -->
+                            <failIfNoTests>${failIfNoTests}</failIfNoTests>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>rerun-failed-test-suite</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skipTests>false</skipTests>
+                            <includes>
+                                <include>**/FailedScenarioRunner.java</include>
+                            </includes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
