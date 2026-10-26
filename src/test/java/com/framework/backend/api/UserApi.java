@@ -32,7 +32,7 @@ public class UserApi extends BaseApi {
 
     public Response loginRaw(User user) {
         LogHelper.info("Logging in as " + user.getEmail());
-        return httpRestClient.sendHttpRequest(Method.POST, LOGIN, Map.of("user", user));
+        return httpRestClient.sendSensitiveHttpRequest(Method.POST, LOGIN, Map.of("user", user));
     }
 
     public UserResponse register(User user) {
