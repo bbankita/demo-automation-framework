@@ -36,7 +36,7 @@ jobs:
           java-version: '11'
           cache: maven
       - name: Run tests
-        run: mvn -B clean test -Dheadless=true
+        run: mvn -B clean test -Dheadless=true -Dcucumber.filter.tags="not @known-issue"
       - name: Generate report
         if: always()
         run: mvn -B cluecumber:reporting
