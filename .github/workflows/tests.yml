@@ -1,0 +1,55 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out tests
+        uses: actions/checkout@v4
+      - name: Check out Conduit App
+        uses: actions/checkout@v4
+        with:
+          repository: bbankita/conduit-realworld-example-app
+          path: conduit
+      - name: Start Conduit
+        working-directory: conduit
+        run: docker compose up -d --build --wait
+      - name: Wait for seed data
+        working-directory: conduit
+        run: docker compose wait seed
+      - name: Smoke check Conduit
+        run: curl --fail --silent --show-error http://localhost:3001/api/articles?limit=1
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+          cache: maven
+      - name: Run tests
+        run: mvn -B clean test -Dheadless=true -Dcucumber.filter.tags="not @known-issue"
+      - name: Generate report
+        if: always()
+        run: mvn -B cluecumber:reporting
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: |
+            target/generated-report/
+            target/cucumber-html/
+            target/framework.log
+      - name: Conduit logs
+        if: failure()
+        working-directory: conduit
+        run: docker compose logs app

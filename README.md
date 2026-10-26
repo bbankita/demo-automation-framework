@@ -3,6 +3,7 @@
 BDD test suite for the [Conduit (RealWorld)](https://github.com/gothinkster/realworld) app, written in Java. It tests
 the REST API, the web UI and the Postgres database underneath. Features run in parallel and clean up their own data.
 
+[![Tests](https://github.com/bbankita/demo-automation-framework/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/bbankita/demo-automation-framework/actions/workflows/tests.yml)
 ![Java](https://img.shields.io/badge/Java-11-007396?logo=openjdk&logoColor=white)
 ![Cucumber](https://img.shields.io/badge/Cucumber-7-23D96C?logo=cucumber&logoColor=white)
 ![Selenium](https://img.shields.io/badge/Selenium-4-43B02A?logo=selenium&logoColor=white)
@@ -168,6 +169,21 @@ Don't pass secrets as `-D` flags. They end up in shell history and Surefire repo
 | Rerun list | `target/failed-scenarios.txt` |
 | Framework log | `target/framework.log` |
 
+## CI
+
+GitHub Actions runs the suite on every push and pull request to `main`. You can also start it by hand from the
+Actions tab. The workflow lives in `.github/workflows/tests.yml`.
+
+Each run:
+
+1. Checks out this repo and the [Conduit app](https://github.com/bbankita/conduit-realworld-example-app).
+2. Starts Conduit and Postgres with Docker Compose and waits until they're ready.
+3. Runs the tests in headless Chrome. Scenarios tagged `@known-issue` are skipped.
+4. Uploads the reports and log as a `test-report` artifact, even when tests fail. Download it from the run's
+   Summary page.
+
+No secrets are needed. The defaults in `config/qa.json` match the Conduit container's.
+
 ## Tags
 
 | Tag | Meaning |
@@ -179,7 +195,6 @@ Don't pass secrets as `-D` flags. They end up in shell history and Surefire repo
 
 ## Roadmap
 
-- GitHub Actions: headless run, report artifact, badge
 - docker-compose for Conduit so setup is one command
 - More UI: delete article, editor validation, non-authors can't edit/delete
 
