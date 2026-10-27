@@ -12,10 +12,7 @@ import org.junit.runner.RunWith;
 @CucumberOptions(
         features = "@target/failed-scenarios.txt",
         glue = {
-                "com.framework.backend.stepdefinitions",
-                "com.framework.frontend.stepdefinitions",
-                "com.framework.common.stepdefinitions",
-                "com.framework.common.utilities"
+                "com.framework.steps",
         },
         plugin = {
                 "summary",
