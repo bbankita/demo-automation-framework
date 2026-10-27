@@ -1,14 +1,14 @@
 package com.framework.testrunners;
 
-import com.framework.common.utilities.LogHelper;
-import com.framework.common.utilities.TestDataFactory;
+import com.framework.core.logging.LogHelper;
+import com.framework.utilities.TestDataFactory;
 import io.cucumber.junit.CucumberOptions;
 import org.junit.BeforeClass;
 
-import static com.framework.common.utilities.ConfigurationReader.getBrowserName;
-import static com.framework.common.utilities.ConfigurationReader.getConfigurations;
-import static com.framework.common.utilities.ConfigurationReader.getEnvironment;
-import static com.framework.common.utilities.ConfigurationReader.isHeadless;
+import static com.framework.core.config.ConfigurationReader.getBrowserName;
+import static com.framework.core.config.ConfigurationReader.getConfigurations;
+import static com.framework.core.config.ConfigurationReader.getEnvironment;
+import static com.framework.core.config.ConfigurationReader.isHeadless;
 
 /**
  * Shared Cucumber options. Subclasses add their own plugins.
@@ -16,10 +16,7 @@ import static com.framework.common.utilities.ConfigurationReader.isHeadless;
 @CucumberOptions(
         features = "classpath:features",
         glue = {
-                "com.framework.backend.stepdefinitions",
-                "com.framework.frontend.stepdefinitions",
-                "com.framework.common.stepdefinitions",
-                "com.framework.common.utilities"
+                "com.framework.steps"
         },
         plugin = {"summary"},
         monochrome = true
