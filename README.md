@@ -75,21 +75,24 @@ flowchart LR
 
 ```
 src/test/java/com/framework/
-├── backend/
-│   ├── api/              BaseApi (status checks), UserApi, ArticleApi
-│   ├── context/          CommonContext (responses, HTTP log), UserContext, ArticleContext
-│   ├── model/            request/response POJOs
-│   ├── stepdefinitions/  auth, user management, articles, shared API assertions
-│   └── utilities/        HttpRestClient, JwtTokenFactory/Parser, UserQueries, ArticleQueries
-├── frontend/
-│   ├── page/             BasePage (wait-wrapped actions), HomePage, EditorPage, ArticlePage
-│   ├── stepdefinitions/  BrowserSteps (hooks), CommonSteps, ArticleSteps
-│   └── utilities/        BrowserSession, DriverManager + Chrome/Firefox, DriverManagerFactory
-├── common/
-│   ├── stepdefinitions/  SharedHooks (cleanup, failure attachments)
-│   └── utilities/        ConfigurationReader, DatabaseClient, TestDataFactory, DataTableTransformers, MarkdownParser, LogHelper
-├── configuration/        typed config POJOs
-├── exceptions/           FrameworkException, UnsupportedBrowserTypeException
+├── core/                 framework internals, no dependencies on the rest of the project
+│   ├── config/           ConfigurationReader + typed config POJOs (Configuration, Database, UserCredentials)
+│   ├── http/             HttpRestClient, ApiRequest (fluent request builder)
+│   ├── db/               DatabaseClient (JDBC, prepared statements)
+│   ├── driver/           BrowserSession, DriverManager + Chrome/Firefox, DriverManagerFactory
+│   ├── logging/          LogHelper
+│   └── exceptions/       FrameworkException, UnsupportedBrowserTypeException
+├── model/                request/response POJOs shared by API, UI and data tables
+├── api/                  BaseApi (status checks), UserApi, ArticleApi
+├── ui/                   BasePage (wait-wrapped actions), HomePage, EditorPage, ArticlePage
+├── db/queries/           UserQueries, ArticleQueries
+├── context/              CommonContext (responses, HTTP log), UserContext, ArticleContext
+├── utilities/            TestDataFactory, JwtTokenFactory/Parser, MarkdownParser
+├── steps/                Cucumber glue: the runners scan only this package
+│   ├── api/              AuthenticationSteps, UserManagementSteps, ArticleSteps, ApiResponseSteps
+│   ├── ui/               BrowserSteps (hooks), UiAuthenticationSteps, ArticleSteps
+│   ├── hooks/            SharedHooks (cleanup, failure attachments)
+│   └── transformers/     DataTableTransformers
 └── testrunners/          BaseTestRunner, TestRunner, FailedScenarioRunner
 src/test/resources/
 ├── config/qa.json        per-env settings, ${ENV_VAR:default} placeholders
@@ -98,6 +101,9 @@ src/test/resources/
 ├── schemas/              JSON schemas for contract checks
 └── logback-test.xml
 ```
+
+Dependencies point inward: `core` imports nothing from the project; `model`, `api`, `ui`, `db` and `context` build on
+`core`; only `steps` and `testrunners` wire everything together.
 
 ### Design decisions
 
