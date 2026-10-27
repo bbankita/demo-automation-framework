@@ -32,7 +32,7 @@ public class UserApi extends BaseApi {
 
     public Response loginRaw(User user) {
         LogHelper.info("Logging in as " + user.getEmail());
-        return httpRestClient.sendSensitiveHttpRequest(Method.POST, LOGIN, Map.of("user", user));
+        return httpRestClient.request(Method.POST, LOGIN).sensitive().body(Map.of("user", user)).send();
     }
 
     public UserResponse register(User user) {
@@ -44,7 +44,7 @@ public class UserApi extends BaseApi {
     }
 
     public Response registerRaw(User user) {
-        return httpRestClient.sendSensitiveHttpRequest(Method.POST, USERS, Map.of("user", user));
+        return httpRestClient.request(Method.POST, USERS).sensitive().body(Map.of("user", user)).send();
     }
 
     public void ensureRegisteredUser(User user) {
@@ -69,7 +69,7 @@ public class UserApi extends BaseApi {
     }
 
     public void getCurrentUser() {
-        httpRestClient.sendHttpRequest(Method.GET, GET_CURRENT_USER_ENDPOINT);
+        httpRestClient.request(Method.GET, GET_CURRENT_USER_ENDPOINT).send();
     }
 
 
