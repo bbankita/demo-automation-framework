@@ -177,16 +177,28 @@ Don't pass secrets as `-D` flags. They end up in shell history and Surefire repo
 
 ## CI
 
-GitHub Actions runs the suite on every push and pull request to `main`. You can also start it by hand from the
-Actions tab. The workflow lives in `.github/workflows/tests.yml`.
+GitHub Actions runs the tests in two tiers, so pull requests get quick feedback and the full suite still runs daily.
+
+| Workflow | Runs when | Tags | Browser |
+|---|---|---|---|
+| Tests (`tests.yml`) | push or pull request to `main`, or started by hand | `@smoke` | Chrome |
+| Regression Tests (`nightly.yml`) | daily at 02:13 UTC, or started by hand | `@api or @ui` (the whole suite) | Chrome and Firefox, in separate jobs |
+
+Both call the reusable workflow `.github/workflows/run-tests.yml`, which takes the tags and browser as inputs.
 
 Each run:
 
 1. Checks out this repo and the [Conduit app](https://github.com/bbankita/conduit-realworld-example-app).
 2. Starts Conduit and Postgres with Docker Compose and waits until they're ready.
-3. Runs the tests in headless Chrome. Scenarios tagged `@known-issue` are skipped.
-4. Uploads the reports and log as a `test-report` artifact, even when tests fail. Download it from the run's
+3. Runs the selected scenarios in headless mode.
+4. Uploads the reports and log as a `test-report-<browser>` artifact, even when tests fail. Download it from the run's
    Summary page.
+
+**Regression Tests stays red while `@known-issue` scenarios fail.** They run on purpose, so open bugs stay visible. To
+spot a new regression, look in the report for failed scenarios without that tag.
+
+To run other scenarios, go to **Actions → Regression Tests → Run workflow** and enter any tag expression, such as
+`not @known-issue`. Manual runs also use both browsers.
 
 No secrets are needed. The defaults in `config/qa.json` match the Conduit container's.
 
@@ -195,13 +207,13 @@ No secrets are needed. The defaults in `config/qa.json` match the Conduit contai
 | Tag | Meaning |
 |---|---|
 | `@api` / `@ui` | layer. UI features need `@ui`, which starts the browser |
-| `@smoke` | happy paths |
+| `@smoke` | happy paths, run on every push and pull request to `main` |
+| `@known-issue` | fails because of an open bug. Runs in Regression Tests, not in the smoke tier |
 | `@auth`, `@login`, `@registration`, `@user-management` | API areas |
 | `@conduit`, `@articles` | UI areas |
 
 ## Roadmap
 
-- docker-compose for Conduit so setup is one command
 - More UI: delete article, editor validation, non-authors can't edit/delete
 
 ## Troubleshooting
