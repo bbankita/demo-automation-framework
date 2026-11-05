@@ -1,0 +1,24 @@
+name: Regression Tests
+
+on:
+  schedule:
+    - cron: '13 2 * * *' # every day at 02:13 UTC
+  pull_request:
+    branches:
+      - main #for testing purposes, remove this later
+  workflow_dispatch:
+    - tags:
+
+permissions:
+    contents: read
+
+jobs:
+  regression-test:
+    uses: ./.github/workflows/run-tests.yml
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chrome, firefox]
+    with:
+      browser: ${{ matrix.browser }}
+      tags: ${{ github.event.inputs.tags || 'not @known-issue' }}
