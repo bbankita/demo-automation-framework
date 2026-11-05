@@ -21,19 +21,18 @@ Feature: Get Current User Details
     And the response should contain a valid JWT token
     And the user password should not be returned in the response
 
-  @known-issue
   Scenario Outline: Fail to retrieve current user when authorization header is missing or invalid
     Given I set the Authorization header to "<auth_header>"
     When I send a request to get the current user
     Then the response status code should be 401
-    And the response error should contain "Token missing or malformed"
+    And the response error should contain "<expected_error>"
 
     Examples:
-      | auth_header              | description                         |
-      |                          | Missing Authorization header        |
-      | Token                    | Missing token payload               |
-      | Token invalid_jwt_string | Malformed or corrupted JWT token    |
-      | Bearer valid_jwt_token   | Invalid authorization scheme prefix |
+      | auth_header              | expected_error             | description                         |
+      |                          | You need to login first!   | Empty Authorization header        |
+      | Token                    | Token missing or malformed | Missing token payload               |
+      | Token invalid_jwt_string | Token missing or malformed | Malformed or corrupted JWT token    |
+      | Bearer valid_jwt_token   | Token missing or malformed | Invalid authorization scheme prefix |
 
   Scenario: Fail to retrieve current user when the JWT token is expired
     Given I have an expired JWT token for user "testCurrentUser@mail.com"
@@ -41,7 +40,7 @@ Feature: Get Current User Details
     Then the response status code should be 401
     And the response error should contain "Token expired, please login again"
 
-  @known-issue
+  @known-issue @issue-4
   Scenario: Fail to retrieve current user if the user account was deleted after token issuance
     Given I am authenticated as "testCurrentUserDelete@mail.com" with password "testCurrent123!"
     And the user account "testCurrentUserDelete@mail.com" is deleted from the database

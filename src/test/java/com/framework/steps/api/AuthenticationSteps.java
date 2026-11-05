@@ -152,21 +152,6 @@ public class AuthenticationSteps {
                 .isNull();
     }
 
-    @Given("I have a login payload missing the {string} field")
-    public void iHaveALoginPayloadMissingTheField(String missingField) {
-        User.Builder builder = TestDataFactory.randomConduitUser().toBuilder();
-        builder.username(null); // Username is not used for login, so always null
-        switch (missingField) {
-            case "email":
-                builder.email(null);
-                break;
-            case "password":
-                builder.password(null);
-                break;
-        }
-        payload = builder.build();
-    }
-
     @Given("an existing registered user exists with credentials:")
     public void anExistingRegisteredUserExistsWithCredentials(List<User> users) {
         users.forEach(userApi::ensureRegisteredUser);
