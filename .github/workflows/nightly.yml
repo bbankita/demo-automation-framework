@@ -7,7 +7,12 @@ on:
     branches:
       - main #for testing purposes, remove this later
   workflow_dispatch:
-    - tags:
+    - inputs:
+        tags:
+          description: 'Cucumber tags to filter tests'
+          required: false
+          type: string
+          default: 'not @known-issue'
 
 permissions:
     contents: read
@@ -21,4 +26,4 @@ jobs:
         browser: [chrome, firefox]
     with:
       browser: ${{ matrix.browser }}
-      tags: ${{ github.event.inputs.tags || 'not @known-issue' }}
+      tags: ${{ github.event.inputs.tags }}
