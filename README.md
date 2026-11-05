@@ -209,6 +209,7 @@ No secrets are needed. The defaults in `config/qa.json` match the Conduit contai
 | `@api` / `@ui` | layer. UI features need `@ui`, which starts the browser |
 | `@smoke` | happy paths, run on every push and pull request to `main` |
 | `@known-issue` | fails because of an open bug. Runs in Regression Tests, not in the smoke tier |
+| `@issue-<number>` | the bug behind a `@known-issue` scenario. The number refers to an [issue in the Conduit repo](https://github.com/bbankita/conduit-realworld-example-app/issues) |
 | `@auth`, `@login`, `@registration`, `@user-management` | API areas |
 | `@conduit`, `@articles` | UI areas |
 

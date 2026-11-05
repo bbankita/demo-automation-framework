@@ -23,19 +23,20 @@ Feature: User Authentication (Login)
       | testLogin@mail.com | LoginTester |
     And the user password should not be returned in the response
 
-  @known-issue
+  @known-issue @issue-1
   Scenario Outline: Fail login when required fields are missing
-    Given I have a login payload missing the "<missing_field>" field
+    Given I have a login payload with:
+      | email   | password   |
+      | <email> | <password> |
     When I send a request to log in
     Then the response status code should be 422
     And the response error should contain "<expected_error>"
 
     Examples:
-      | missing_field | expected_error          |
-      | email         | email can't be blank    |
-      | password      | password can't be blank |
+      | email              | password      | expected_error         |
+      |                    | testLogin123! | An email is required   |
+      | testLogin@mail.com |               | A password is required |
 
-  @known-issue
   Scenario Outline: Fail login with invalid credentials
     Given I have a login payload with:
       | email   | password   |
@@ -45,12 +46,18 @@ Feature: User Authentication (Login)
     And the response error should contain "Wrong email/password combination"
 
     Examples:
-      | email                            | password      | description              |
-      | testLogin@mail.com               | wrongpass123  | Incorrect password       |
-      | testLogin_non_existent@jake.jake | testLogin123! | Unregistered email       |
-      | testLogin@mail.com               | TestLogin123! | Case-mismatched password |
+    Working examples
+      | email              | password      | description              |
+      | testLogin@mail.com | wrongpass123  | Incorrect password       |
+      | testLogin@mail.com | TestLogin123! | Case-mismatched password |
 
-  @known-issue
+    @known-issue @issue-2
+    Examples:
+    Unregistered email returns 404
+      | email                            | password      | description        |
+      | testLogin_non_existent@jake.jake | testLogin123! | Unregistered email |
+
+  @known-issue @issue-3
   Scenario: Fail login with malformed email format
     Given I have a login payload with:
       | email     | password      |
