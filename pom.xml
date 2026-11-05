@@ -8,7 +8,7 @@
     <artifactId>demo-automation-framework</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <name>Demo Automation Framework</name>
-    <description>Cucumber BDD framework: API tests (Conduit) and UI tests (SauceDemo)</description>
+    <description>Cucumber BDD framework: API, UI and database tests for the Conduit app</description>
 
     <properties>
         <maven.compiler.release>11</maven.compiler.release>

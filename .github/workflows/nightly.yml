@@ -1,0 +1,26 @@
+name: Regression Tests
+
+on:
+  schedule:
+    - cron: '13 2 * * *' # every day at 02:13 UTC
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: 'Cucumber tags to filter tests'
+        required: false
+        type: string
+        default: '@api or @ui'
+
+permissions:
+  contents: read
+
+jobs:
+  regression-test:
+    uses: ./.github/workflows/run-tests.yml
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [ chrome, firefox ]
+    with:
+      browser: ${{ matrix.browser }}
+      tags: ${{ github.event.inputs.tags || '@api or @ui' }}
