@@ -9,7 +9,7 @@ on:
         description: 'Cucumber tags to filter tests'
         required: false
         type: string
-        default: '@api or @ui'
+        default: 'not @known-issue'
 
 permissions:
   contents: read
@@ -23,4 +23,13 @@ jobs:
         browser: [ chrome, firefox ]
     with:
       browser: ${{ matrix.browser }}
-      tags: ${{ github.event.inputs.tags || '@api or @ui' }}
+      tags: ${{ github.event.inputs.tags || 'not @known-issue' }}
+      suite: 'regression'
+
+  known-issues:
+    uses: ./.github/workflows/run-tests.yml
+    with:
+      browser: 'chrome'
+      tags: '@known-issue'
+      suite: 'known-issues'
+      expected_failures: true
