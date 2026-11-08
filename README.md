@@ -182,23 +182,37 @@ GitHub Actions runs the tests in two tiers, so pull requests get quick feedback 
 | Workflow | Runs when | Tags | Browser |
 |---|---|---|---|
 | Tests (`tests.yml`) | push or pull request to `main`, or started by hand | `@smoke` | Chrome |
-| Regression Tests (`nightly.yml`) | daily at 02:13 UTC, or started by hand | `@api or @ui` (the whole suite) | Chrome and Firefox, in separate jobs |
+| Regression Tests (`nightly.yml`), `regression-test` job | daily at 02:13 UTC, or started by hand | `not @known-issue` | Chrome and Firefox, in separate jobs |
+| Regression Tests (`nightly.yml`), `known-issues` job | same run as `regression-test` | `@known-issue` | Chrome |
 
-Both call the reusable workflow `.github/workflows/run-tests.yml`, which takes the tags and browser as inputs.
+Both workflows call the reusable workflow `.github/workflows/run-tests.yml`, which takes the tags, browser and suite name
+as inputs.
 
 Each run:
 
 1. Checks out this repo and the [Conduit app](https://github.com/bbankita/conduit-realworld-example-app).
 2. Starts Conduit and Postgres with Docker Compose and waits until they're ready.
 3. Runs the selected scenarios in headless mode.
-4. Uploads the reports and log as a `test-report-<browser>` artifact, even when tests fail. Download it from the run's
-   Summary page.
+4. In the `known-issues` job, checks each result with `check_known_issues.py`.
+5. Uploads the reports and log as a `test-report-<suite>-<browser>` artifact, even when tests fail. Download it from the
+   run's Summary page.
 
-**Regression Tests stays red while `@known-issue` scenarios fail.** They run on purpose, so open bugs stay visible. To
-spot a new regression, look in the report for failed scenarios without that tag.
+**Reading a red Regression Tests run.** The job that failed tells you what happened:
 
-To run other scenarios, go to **Actions → Regression Tests → Run workflow** and enter any tag expression, such as
-`not @known-issue`. Manual runs also use both browsers.
+| Failed job | Meaning | What to do |
+|---|---|---|
+| `regression-test` | a scenario outside the known issues failed | treat it as a regression |
+| `known-issues` | a known issue passed, so its tag is stale | remove `@known-issue` and close the issue if the bug is fixed |
+| `known-issues` | setup failed, there's no `When` step, a step has an unexpected status such as `undefined`, or a known issue has no `@issue-<number>` tag | fix the scenario or add the tag, because the result says nothing about the bug |
+| `known-issues` | the report is unreadable or has no scenarios | check the Maven step's log, because the run itself went wrong |
+
+**Known issues are checked, not ignored.** They're meant to fail, so Maven's exit code can't judge them.
+`.github/scripts/check_known_issues.py` reads the Cucumber JSON instead. A scenario counts as an expected failure only if
+it fails after its `When` step and has an `@issue-<number>` tag. A stale tag turns the run red on purpose, because the tag
+needs removing.
+
+To run other scenarios, go to **Actions → Regression Tests → Run workflow** and enter any tag expression. The tags apply
+to `regression-test`, on both browsers. `known-issues` always runs `@known-issue`.
 
 No secrets are needed. The defaults in `config/qa.json` match the Conduit container's.
 
@@ -208,7 +222,7 @@ No secrets are needed. The defaults in `config/qa.json` match the Conduit contai
 |---|---|
 | `@api` / `@ui` | layer. UI features need `@ui`, which starts the browser |
 | `@smoke` | happy paths, run on every push and pull request to `main` |
-| `@known-issue` | fails because of an open bug. Runs in Regression Tests, not in the smoke tier |
+| `@known-issue` | fails because of an open bug. Runs in its own Regression Tests job, not in the smoke tier |
 | `@issue-<number>` | the bug behind a `@known-issue` scenario. The number refers to an [issue in the Conduit repo](https://github.com/bbankita/conduit-realworld-example-app/issues) |
 | `@auth`, `@login`, `@registration`, `@user-management` | API areas |
 | `@conduit`, `@articles` | UI areas |
